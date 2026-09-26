@@ -12,7 +12,8 @@ Purpose: a simple free utility that doubles as a **test bed for in-app ads**.
 
 ## Status (2026-09-27)
 v1.0.0 (versionCode 1) built and signed; not yet uploaded to Play. Package in `releases/v1.0.0-1/` (gitignored; in local + Drive backups).
-Next: host `docs/privacy-policy.html`, create the Play listing from `docs/play-listing.md`, upload the AAB. Then add AdMob per `docs/ads.md` (bump version).
+Privacy policy and terms live on the shared tools site: https://tools.homilabs.org/privacy#beam and /terms#beam (source `/mnt/storage/projects/homilabs_tools/site/`, manual upload to Hostinger).
+Next: upload the tools site, create the Play listing from `docs/play-listing.md`, upload the AAB. Then add AdMob per `docs/ads.md` (bump version).
 
 ## Commands
 - Tests: `flutter test` (26). Device: `flutter test integration_test/device_test.dart -d R58R61F3FDK` (8; uninstalls the app afterwards).

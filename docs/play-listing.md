@@ -14,7 +14,8 @@ When the ad SDK is added, update the items marked **[ADS]** before that release 
 | Category | Tools |
 | Tags (suggested) | Flashlight, Tools, Utilities |
 | Contact email | `homilabs.smc@gmail.com` (**confirm**: copied from your EchoSteps listing) |
-| Privacy policy URL | Host `docs/privacy-policy.html` (see "Hosting the privacy policy" below) |
+| Privacy policy URL | `https://tools.homilabs.org/privacy#beam` |
+| Website (optional) | `https://tools.homilabs.org/#beam` |
 
 ## Short description (≤80)
 ```
@@ -81,7 +82,9 @@ First release: torch, adjustable strobe, SOS and Morse signals, and a colour scr
 ```
 - If your developer account is a *personal* account created after Nov 2023, Play requires a closed test with 12 testers for 14 days before Production access.
 
-## Hosting the privacy policy
-Any public URL works. Options:
-1. GitHub Pages on the public repo (Settings → Pages → Deploy from branch `main`, folder `/docs`), giving `https://awaizfatima08.github.io/beam/privacy-policy.html`.
-2. Your existing Hostinger site (e.g. `https://homilabs.org/beam/privacy-policy.html`).
+## Privacy policy and terms
+Hosted on the HomiLabs tools site (source: `/mnt/storage/projects/homilabs_tools/site/`, uploaded to Hostinger):
+- Privacy: `https://tools.homilabs.org/privacy#beam`
+- Terms: `https://tools.homilabs.org/terms#beam`
+
+**[ADS]** Update Beam's sections in `site/privacy.html` (and the Play Data safety form) before a version with ads is released.

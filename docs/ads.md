@@ -40,7 +40,7 @@ Every interstitial request is logged as `[ads] interstitial <placement> shown|ca
 
 ## Before releasing a version with ads
 - Play Console: set **Contains ads = Yes**; update **Data safety** (see `docs/play-listing.md`, items marked [ADS]); fill in the Advertising ID declaration.
-- Update `docs/privacy-policy.html` (and the hosted copy) to name the ad provider and what it collects.
+- Update Beam's section in the tools site (`/mnt/storage/projects/homilabs_tools/site/privacy.html#beam`) to name the ad provider and what it collects, and re-upload it.
 - Remove the "No tracking"-type claims from any listing text (the current listing already avoids them).
 - Keep the target audience at 13+ unless you use a Families-certified ad network.
 - Bump `version:` in `pubspec.yaml`.
