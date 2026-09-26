@@ -13,7 +13,14 @@ Future<void> main() async {
   final settings = await Settings.load();
   final torch = TorchController(MethodChannelTorch());
   await torch.init(savedStrength: settings.torchStrength);
-  runApp(BeamApp(
-    services: AppServices(torch: torch, settings: settings, ads: AdService.fromEnvironment(), screen: const ScreenControl()),
-  ));
+  runApp(
+    BeamApp(
+      services: AppServices(
+        torch: torch,
+        settings: settings,
+        ads: AdService.fromEnvironment(),
+        screen: const ScreenControl(),
+      ),
+    ),
+  );
 }

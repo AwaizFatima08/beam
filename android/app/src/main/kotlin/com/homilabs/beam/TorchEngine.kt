@@ -23,6 +23,7 @@ class TorchEngine(context: Context, private val onState: (Map<String, Any?>) -> 
     private val thread = HandlerThread("beam-torch").apply { start() }
     private val worker = Handler(thread.looper)
     private val main = Handler(Looper.getMainLooper())
+    private val debuggable = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     val cameraId: String? = findFlashCamera()
     val maxStrength: Int = readMaxStrength()
@@ -106,18 +107,24 @@ class TorchEngine(context: Context, private val onState: (Map<String, Any?>) -> 
         emit()
         worker.post {
             var next = SystemClock.uptimeMillis()
+            var pass = 0
             try {
                 do {
+                    var worstLag = 0L
                     for ((i, d) in durations.withIndex()) {
                         if (gen != patternGeneration) return@post
                         val on = i % 2 == 0
                         if (d > 0) {
                             if (on && level != null && supportsStrength) applyStrength(level) else setMode(on)
                         }
+                        // How late the switch landed versus its deadline (debug timing check).
+                        worstLag = maxOf(worstLag, SystemClock.uptimeMillis() - next)
                         next += d
                         val wait = next - SystemClock.uptimeMillis()
                         if (wait > 0) SystemClock.sleep(wait)
                     }
+                    pass++
+                    if (debuggable && pass % 10 == 1) Log.d(TAG, "pattern pass $pass: worst switch lag ${worstLag}ms")
                 } while (repeat && gen == patternGeneration)
             } finally {
                 if (gen == patternGeneration) {

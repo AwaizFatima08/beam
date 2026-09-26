@@ -43,3 +43,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Beam: secrets and release artifacts stay out of the public repo
+.secrets/
+android/key.properties
+*.keystore
+*.jks
+releases/
+scripts/backup.log

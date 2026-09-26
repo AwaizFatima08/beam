@@ -62,8 +62,8 @@ class FrequencyCap {
     this.minInterval = const Duration(seconds: 90),
     this.launchGrace = const Duration(seconds: 60),
     DateTime Function()? clock,
-  })  : _clock = clock ?? DateTime.now,
-        _startedAt = (clock ?? DateTime.now)();
+  }) : _clock = clock ?? DateTime.now,
+       _startedAt = (clock ?? DateTime.now)();
 
   final Duration minInterval;
   final Duration launchGrace;
@@ -131,8 +131,10 @@ class _PlaceholderBanner extends StatelessWidget {
         color: c.surfaceContainerHighest.withValues(alpha: 0.4),
         border: Border.all(color: c.outlineVariant),
       ),
-      child: Text('Ad slot · ${placement.id} · 320×50',
-          style: TextStyle(color: c.onSurfaceVariant, fontSize: 12, letterSpacing: 0.3)),
+      child: Text(
+        'Ad slot · ${placement.id} · 320×50',
+        style: TextStyle(color: c.onSurfaceVariant, fontSize: 12, letterSpacing: 0.3),
+      ),
     );
   }
 }

@@ -6,7 +6,12 @@ import 'package:flutter/services.dart';
 /// What the phone's flash can do. Strength control needs Android 13+ and a
 /// flash driver that reports more than one level.
 class TorchInfo {
-  const TorchInfo({required this.hasFlash, required this.maxStrength, required this.defaultStrength, required this.sdkInt});
+  const TorchInfo({
+    required this.hasFlash,
+    required this.maxStrength,
+    required this.defaultStrength,
+    required this.sdkInt,
+  });
 
   final bool hasFlash;
   final int maxStrength;
