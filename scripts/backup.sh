@@ -55,7 +55,7 @@ if ! command -v rclone >/dev/null 2>&1 || ! rclone listremotes 2>/dev/null | gre
 elif rclone copy "$PROJECT_DIR" "${GDRIVE_REMOTE}:" \
     --drive-root-folder-id "$GDRIVE_FOLDER_ID" \
     --exclude "scripts/backup.log" --exclude ".git/**" --exclude-from "$EXCLUDES" \
-    --update --checksum --log-file="$LOG_FILE" --log-level INFO; then
+    --update --checksum --tpslimit 4 --retries 5 --low-level-retries 20 --log-file="$LOG_FILE" --log-level INFO; then
   log "  OK — synced to Google Drive folder ($GDRIVE_FOLDER_ID)"
 else
   log "  ERROR — rclone sync failed (see log)"
