@@ -11,7 +11,7 @@ Purpose: a simple free utility that doubles as a **test bed for in-app ads**.
 - Ads: every slot goes through `lib/ads/ads.dart` (`AdPlacement` ids are stable — ad dashboards use them). Debug/profile builds show placeholders; release shows nothing until a real `AdService` exists. Never show an interstitial while a light is running. See `docs/ads.md`.
 
 ## Status (2026-09-27)
-v1.0.0 (versionCode 1) built and signed; not yet uploaded to Play. Package in `releases/v1.0.0-1/` (gitignored; in local + Drive backups).
+Play app created in the Homilabs org account (app id 4975968279685186807); listing, content rating and all App content declarations done. versionCode 1 (1.0.0) was uploaded without the in-app privacy link and is burned; the production release uses **1.0.1 (versionCode 2)** from `releases/v1.0.1-2/` (adds the About sheet with Privacy/Terms links). Next versionCode must be ≥ 3.
 Privacy policy and terms live on the shared tools site: https://tools.homilabs.org/privacy#beam and /terms#beam (source `/mnt/storage/projects/homilabs_tools/site/`, manual upload to Hostinger).
 Next: upload the tools site, create the Play listing from `docs/play-listing.md`, upload the AAB. Then add AdMob per `docs/ads.md` (bump version).
 

@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:beam/ads/ads.dart';
 import 'package:beam/app.dart';
 import 'package:beam/services/screen.dart';
 import 'package:beam/services/settings.dart';
 import 'package:beam/services/torch.dart';
+import 'package:beam/views/about_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -195,5 +198,21 @@ void main() {
     }
     expect(ads.log, ['screen_light_exit:shown', 'screen_light_exit:capped']);
     expect(find.byKey(const Key('ad-interstitial')), findsNothing);
+  });
+
+  testWidgets('about sheet shows version and privacy/terms links', (tester) async {
+    await pumpBeam(tester);
+    await tester.tap(find.byKey(const Key('about')));
+    await tester.pumpAndSettle();
+    expect(find.text('Version $appVersion · by HomiLabs'), findsOneWidget);
+    expect(find.byKey(const Key('about-privacy')), findsOneWidget);
+    expect(find.byKey(const Key('about-terms')), findsOneWidget);
+  });
+
+  test('appVersion matches pubspec', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    final v = RegExp(r'^version: (\S+)\+', multiLine: true).firstMatch(pubspec)!.group(1);
+    expect(appVersion, v);
+    expect(privacyUrl, startsWith('https://tools.homilabs.org/'));
   });
 }

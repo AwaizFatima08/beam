@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../widgets/power_button.dart';
+import 'about_sheet.dart';
 import 'home.dart';
 
 class TorchTab extends StatelessWidget {
@@ -30,10 +31,17 @@ class TorchTab extends StatelessWidget {
             TabHeader(
               title: 'Beam',
               subtitle: 'Torch',
-              trailing: StatusPill(
-                key: const Key('torch-status'),
-                label: label,
-                active: torch.isOn || torch.patternRunning,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  StatusPill(key: const Key('torch-status'), label: label, active: torch.isOn || torch.patternRunning),
+                  IconButton(
+                    key: const Key('about'),
+                    tooltip: 'About Beam',
+                    icon: const Icon(Icons.info_outline, color: Colors.white60),
+                    onPressed: () => showAboutSheet(context),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24),

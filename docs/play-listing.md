@@ -74,9 +74,9 @@ Tablet screenshots are optional; Beam is a phone app (portrait only).
 - **Photosensitivity**: not a Play form, but the in-app warning and the description line above cover it.
 
 ## Release
-- Upload `releases/v1.0.0-1/beam-1.0.0-1.aab` to a testing track first (Internal testing is instant), then Production.
+- Upload `releases/v1.0.1-2/beam-1.0.1-2.aab` to a testing track first (Internal testing is instant), then Production.
 - Play App Signing: accept Google-managed signing. The upload key is `.secrets/beam-upload.keystore` (password in `.secrets/README.txt`; both in the local and Drive backups, never in Git).
-- Release name: `1.0.0 (1)`. Release notes:
+- Release name: `1.0.1 (2)`. Release notes:
 ```
 First release: torch, adjustable strobe, SOS and Morse signals, and a colour screen light.
 ```
