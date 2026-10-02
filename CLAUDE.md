@@ -10,14 +10,15 @@ Purpose: a simple free utility that doubles as a **test bed for in-app ads**.
 - Flashing-light warning before the first signal. Strobe capped at 15 Hz.
 - Ads: every slot goes through `lib/ads/ads.dart` (`AdPlacement` ids are stable — ad dashboards use them). Debug/profile builds show placeholders; release shows nothing until a real `AdService` exists. Never show an interstitial while a light is running. See `docs/ads.md`.
 
-## Status (2026-09-28)
+## Status (2026-10-02)
 Play app created in the Homilabs org account (app id 4975968279685186807); listing, content rating and all App content declarations done. versionCode 1 (1.0.0) was uploaded without the in-app privacy link and is burned; the production release uses **1.0.1 (versionCode 2)** from `releases/v1.0.1-2/` (adds the About sheet with Privacy/Terms links). Next versionCode must be ≥ 3.
 Privacy policy and terms live on the shared tools site: https://tools.homilabs.org/privacy#beam and /terms#beam (source `/mnt/storage/projects/homilabs_tools/site/`, manual upload to Hostinger).
-1.0.1 (versionCode 2) submitted to Google Play **production** on 2026-09-28; under review. Tools site is live on Hostinger.
-After approval: in `/mnt/storage/projects/homilabs_tools/site/index.html` swap Beam's "Coming soon" span for the commented Play link and re-upload. Still to do: check the About sheet on the test phone (it was unplugged when 1.0.1 was built). Then add AdMob per `docs/ads.md` (bump version).
+**Live on Google Play** since 2026-10-02: 1.0.1 (versionCode 2) in production — https://play.google.com/store/apps/details?id=com.homilabs.beam
+Homi will review user feedback around **2026-11-02** and then decide on a revision/upgrade (likely candidates: AdMob per `docs/ads.md`, anything raised in reviews). Next versionCode must be ≥ 3.
+Open item: the About sheet (1.0.1) has not been checked on the test phone yet (it was unplugged when 1.0.1 was built).
 
 ## Commands
-- Tests: `flutter test` (26). Device: `flutter test integration_test/device_test.dart -d R58R61F3FDK` (8; uninstalls the app afterwards).
+- Tests: `flutter test` (28). Device: `flutter test integration_test/device_test.dart -d R58R61F3FDK` (8; uninstalls the app afterwards).
 - Graphics: `flutter test tool/store_screens_test.dart && flutter test tool/make_graphics_test.dart`.
 - Release: `flutter build appbundle --release` and `flutter build apk --release` (signs via `android/key.properties` → `.secrets/beam-upload.keystore`).
 - Backup: `bash scripts/backup.sh` (commit first; the GitHub layer refuses untracked/uncommitted files).
