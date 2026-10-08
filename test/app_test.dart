@@ -207,6 +207,7 @@ void main() {
     expect(find.text('Version $appVersion · by HomiLabs'), findsOneWidget);
     expect(find.byKey(const Key('about-privacy')), findsOneWidget);
     expect(find.byKey(const Key('about-terms')), findsOneWidget);
+    expect(find.byKey(const Key('about-community')), findsOneWidget);
   });
 
   test('appVersion matches pubspec', () {
