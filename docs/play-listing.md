@@ -91,16 +91,17 @@ Hosted on the HomiLabs tools site (source: `/mnt/storage/projects/homilabs_tools
 **[ADS]** Update Beam's sections in `site/privacy.html` (and the Play Data safety form) before a version with ads is released.
 
 ## 1.1.0 (versionCode 3) — ads release checklist
-- [ ] `bash scripts/check-release-ad-ids.sh` → PASS (real AdMob ids in place)
-- [ ] Privacy policy uploaded to tools.homilabs.org (Beam section dated 18 October 2026)
+- [x] `bash scripts/check-release-ad-ids.sh` → PASS (real AdMob ids in place)
+- [x] Privacy policy uploaded to tools.homilabs.org (Beam section dated 18 October 2026) — 2026-10-19
 - [x] `app-ads.txt` live at https://tools.homilabs.org/app-ads.txt (`google.com, pub-2087846699268567, DIRECT, f08c47fec0942fa0`) — check Beam's AdMob app shows it as verified
-- [ ] App content → **Ads**: Yes, my app contains ads
-- [ ] App content → **Advertising ID**: Yes, used for Advertising or marketing (and Analytics, Fraud prevention)
-- [ ] App content → **Data safety**: collects and shares — Device or other IDs; App activity (App interactions);
+- [x] App content → **Ads**: Yes, my app contains ads
+- [x] App content → **Advertising ID**: Yes, used for Advertising or marketing (and Analytics, Fraud prevention)
+- [x] App content → **Data safety**: collects and shares — Device or other IDs; App activity (App interactions);
       App info and performance (Crash logs, Diagnostics); Location (Approximate, from IP). Purposes: Advertising or
       marketing, Analytics, Fraud prevention/security. Data is encrypted in transit. Users can't request deletion
       from Beam itself (no account) — point to Google's controls.
-- [ ] Store listing → full description updated (above)
+- [x] Store listing → full description updated (above); AI asset declaration: don't label (graphics are code-drawn)
+- [ ] Upload `releases/v1.1.0-3/beam-1.1.0-3.aab` to Production, then send all changes for review together (managed publishing is off)
 - [ ] Release notes:
 ```
 <en-US>
