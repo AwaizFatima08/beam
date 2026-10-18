@@ -1,46 +1,37 @@
-# Adding ads to Beam (test bed guide)
+# Ads in Beam (AdMob)
 
-Beam v1.0.0 ships with **no ad SDK**. Every place an ad can appear is already wired up in
-`lib/ads/ads.dart`, so adding a network only means implementing one class.
+From **1.1.0 (versionCode 3)** Beam is free and supported by Google AdMob. This is the HomiLabs ads test bed,
+so the rules below are deliberately conservative.
 
-## What is already in place
-| Placement id | Kind | Where / when |
+## Formats and placements
+| Placement id (stable) | Format | When it can appear |
 |---|---|---|
-| `home_banner` | Banner 320×50 | Above the bottom navigation on every tab (`AdBannerSlot` in `lib/views/home.dart`). |
-| `screen_light_exit` | Interstitial | After the user leaves the full-screen glow (`lib/views/screen_tab.dart`). |
-| `signal_stopped` | Interstitial | After the user stops a flash signal, or leaves a screen signal (`lib/views/signal_tab.dart`). |
+| `home_banner` | Banner 320×50 | Above the bottom menu on the **Signal** and **Screen** tabs only. Never on the Torch tab, never while a glow, screen signal or dialog covers the screen (the banner is disposed, so it never refreshes unseen). |
+| `screen_light_exit` | Interstitial | After the user closes the full-screen glow. |
+| `signal_stopped` | Interstitial | After the user stops a flash signal, or leaves a screen signal. |
+| `ad_free_reward` | Rewarded (opt-in) | "No ads for 24 hours — Watch a short ad" row above the banner. Shown **only while a rewarded ad is loaded** and the user isn't already ad-free. |
 
-Rules built in (keep them; they protect ratings and Play policy):
-- An interstitial is **never** requested while a light or signal is running, only at the natural break after it.
-- `FrequencyCap`: nothing in the first 60 s after launch, then at most one interstitial per 90 s.
-- The banner slot reserves its 50 dp, so the layout does not jump when an ad loads.
+Rules, all enforced in one place (`Ads` in `lib/ads/ads.dart`):
+- Interstitials: none in the first 60 s after launch, then at most one per 90 s, never while the torch or a signal is on.
+- Rewarded: grants 24 h without banners and interstitials **only** when the ad is watched to the end (`Rewarded`);
+  closing early (`Dismissed`) or no ad (`NoFill`) grants nothing. The pass is stored on the phone (`adFreeUntil`).
+- Consent: Google's UMP form runs before the SDK starts (shown only where required, e.g. EEA/UK/CH). When the rules
+  require it, About shows **Ad privacy choices**.
 
-Build modes (`--dart-define=BEAM_ADS=...`):
-- `placeholder` — grey boxes/dialogs labelled with the placement id. **Default for debug/profile builds.**
-- `off` — nothing. **Default for release builds.**
-Every interstitial request is logged as `[ads] interstitial <placement> shown|capped`.
+## Code map
+- `lib/ads/ads.dart` — policy (`Ads`), the `AdNetwork` seam, `FrequencyCap`, `RewardOutcome`, placeholder and no-op networks.
+- `lib/ads/admob_network.dart` — the only file that imports `google_mobile_ads`.
+- `lib/ads/ad_ids.dart` — unit ids. Debug/profile always use Google's sample units; release uses `AdUnitIds.release`.
+- `android/app/build.gradle.kts` — `admobAppId` manifest placeholder (sample for debug, Beam's id for release).
+- Build switch: `--dart-define=BEAM_ADS=admob|placeholder|off` (default `admob`).
 
-## Adding Google AdMob (recommended first network)
-1. Create the app in AdMob, then one ad unit per placement (Banner for `home_banner`, Interstitial for the other two). Until the app is approved, use Google's **test** unit ids:
-   - Banner `ca-app-pub-3940256099942544/6300978111`
-   - Interstitial `ca-app-pub-3940256099942544/1033173712`
-   - Test app id `ca-app-pub-3940256099942544~3347511713`
-2. `flutter pub add google_mobile_ads`
-3. `android/app/src/main/AndroidManifest.xml`, inside `<application>`:
-   ```xml
-   <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-XXXXXXXX~YYYYYYYY"/>
-   ```
-   The plugin adds the `INTERNET` and `AD_ID` permissions itself.
-4. Add `lib/ads/admob_ad_service.dart` implementing `AdService`:
-   - `banner()` returns a widget holding a `BannerAd` (`AdSize.banner`) for the placement's unit id.
-   - `maybeShowInterstitial()` checks `cap.canShow`, shows a preloaded `InterstitialAd`, calls `cap.recordShown()`, and preloads the next one.
-   - `MobileAds.instance.initialize()` in `main()` before `runApp`.
-5. Add an `admob` mode to `AdService.fromEnvironment()` and build with `--dart-define=BEAM_ADS=admob`.
-6. Consent: users in the EEA/UK need a consent form. Use the UMP SDK that ships with `google_mobile_ads` (`ConsentInformation.instance.requestConsentInfoUpdate` → `ConsentForm.loadAndShowConsentFormIfRequired`) before loading ads, and add a "Privacy options" entry point (e.g. a small settings sheet).
-
-## Before releasing a version with ads
-- Play Console: set **Contains ads = Yes**; update **Data safety** (see `docs/play-listing.md`, items marked [ADS]); fill in the Advertising ID declaration.
-- Update Beam's section in the tools site (`/mnt/storage/projects/homilabs_tools/site/privacy.html#beam`) to name the ad provider and what it collects, and re-upload it.
-- Remove the "No tracking"-type claims from any listing text (the current listing already avoids them).
-- Keep the target audience at 13+ unless you use a Families-certified ad network.
-- Bump `version:` in `pubspec.yaml`.
+## Before every release with ads
+1. `bash scripts/check-release-ad-ids.sh` must print PASS (it refuses Google's sample ids).
+2. AdMob: Beam registered as an app (linked to the Play listing), 3 ad units (banner, interstitial, rewarded),
+   **app-ads.txt**: already live at https://tools.homilabs.org/app-ads.txt (publisher `pub-2087846699268567`), which is Beam's Play website — nothing to add,
+   and a GDPR + US-states consent message published in *Privacy & messaging*.
+3. Privacy policy: Beam's section on tools.homilabs.org describes AdMob (source updated 2026-10-18; upload it
+   **before** 1.1.0 goes live).
+4. Play Console: Ads = **Yes**; Data safety and Advertising ID updated (see `docs/play-listing.md`, [ADS] items);
+   store description no longer claims "no permissions" / "fully offline".
+5. Test on a device with the sample ids (debug build) — never tap real ads on your own device.

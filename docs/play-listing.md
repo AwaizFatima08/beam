@@ -44,15 +44,16 @@ SCREEN LIGHT
 • Adjust brightness with a slider or by swiping up and down
 • Keeps the screen awake while it glows
 
-SMALL AND PRIVATE
+SIMPLE AND FAIR
 • No login and no account
-• Works fully offline
-• Needs no permissions — not even camera access
+• The torch, signals and screen light work without a connection
+• No camera, location or storage permission
 • Settings stay on your phone
+• Free with a few ads — never while a light is on. Watch one optional ad for 24 hours without ads.
 
 Safety: signals flash rapidly. Flashing light can trigger seizures in people with photosensitive epilepsy. Never shine the light into anyone's eyes.
 ```
-**[ADS]** Add a line such as "Beam is free and supported by ads." when ads ship.
+(Updated for 1.1.0 with ads. The old "works fully offline / needs no permissions" lines are gone because the ad SDK needs internet and the advertising ID.)
 
 ## Graphics (in `store-assets/`)
 | Asset | File | Spec |
@@ -88,3 +89,24 @@ Hosted on the HomiLabs tools site (source: `/mnt/storage/projects/homilabs_tools
 - Terms: `https://tools.homilabs.org/terms#beam`
 
 **[ADS]** Update Beam's sections in `site/privacy.html` (and the Play Data safety form) before a version with ads is released.
+
+## 1.1.0 (versionCode 3) — ads release checklist
+- [ ] `bash scripts/check-release-ad-ids.sh` → PASS (real AdMob ids in place)
+- [ ] Privacy policy uploaded to tools.homilabs.org (Beam section dated 18 October 2026)
+- [x] `app-ads.txt` live at https://tools.homilabs.org/app-ads.txt (`google.com, pub-2087846699268567, DIRECT, f08c47fec0942fa0`) — check Beam's AdMob app shows it as verified
+- [ ] App content → **Ads**: Yes, my app contains ads
+- [ ] App content → **Advertising ID**: Yes, used for Advertising or marketing (and Analytics, Fraud prevention)
+- [ ] App content → **Data safety**: collects and shares — Device or other IDs; App activity (App interactions);
+      App info and performance (Crash logs, Diagnostics); Location (Approximate, from IP). Purposes: Advertising or
+      marketing, Analytics, Fraud prevention/security. Data is encrypted in transit. Users can't request deletion
+      from Beam itself (no account) — point to Google's controls.
+- [ ] Store listing → full description updated (above)
+- [ ] Release notes:
+```
+<en-US>
+Beam is now free with a few ads.
+• Ads appear only on the Signal and Screen tabs and after you finish a signal or the screen light, never while a light is on
+• Watch one optional ad to turn off all ads for 24 hours
+• New: About → Ad privacy choices (where required)
+</en-US>
+```

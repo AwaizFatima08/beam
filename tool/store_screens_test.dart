@@ -44,10 +44,11 @@ Future<AppServices> pump(WidgetTester tester, {Map<String, Object> prefs = const
   SharedPreferences.setMockInitialValues({'flashWarningAccepted': true, ...prefs});
   final torch = TorchController(FakeTorchPlatform());
   await torch.init();
+  final settings = await Settings.load();
   final services = AppServices(
     torch: torch,
-    settings: await Settings.load(),
-    ads: const NoAdService(),
+    settings: settings,
+    ads: Ads(network: NoAdNetwork(), settings: settings, isLightOn: () => false),
     screen: const ScreenControl(),
   );
   await tester.pumpWidget(

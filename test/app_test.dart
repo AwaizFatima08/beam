@@ -15,7 +15,9 @@ import 'fake_torch.dart';
 Future<(FakeTorchPlatform, AppServices)> pumpBeam(
   WidgetTester tester, {
   TorchInfo info = const TorchInfo(hasFlash: true, maxStrength: 5, defaultStrength: 3, sdkInt: 34),
-  AdService? ads,
+  AdNetwork? network,
+  FrequencyCap? cap,
+  DateTime Function()? clock,
   Map<String, Object> prefs = const {},
 }) async {
   await tester.binding.setSurfaceSize(const Size(400, 900));
@@ -24,10 +26,17 @@ Future<(FakeTorchPlatform, AppServices)> pumpBeam(
   final platform = FakeTorchPlatform(torchInfo: info);
   final torch = TorchController(platform);
   await torch.init();
+  final settings = await Settings.load();
   final services = AppServices(
     torch: torch,
-    settings: await Settings.load(),
-    ads: ads ?? const NoAdService(),
+    settings: settings,
+    ads: Ads(
+      network: network ?? NoAdNetwork(),
+      settings: settings,
+      isLightOn: () => torch.isOn || torch.patternRunning,
+      cap: cap,
+      clock: clock,
+    ),
     screen: const ScreenControl(),
   );
   await tester.pumpWidget(BeamApp(services: services));
@@ -177,10 +186,48 @@ void main() {
     expect(find.byKey(const Key('screen-signal')), findsNothing);
   });
 
-  testWidgets('ad placeholders: banner reserved, interstitial capped', (tester) async {
-    final ads = PlaceholderAdService(cap: FrequencyCap(launchGrace: Duration.zero));
-    await pumpBeam(tester, ads: ads);
+  FrequencyCap noGrace() => FrequencyCap(launchGrace: Duration.zero);
+
+  testWidgets('ads start once after the first frame', (tester) async {
+    final net = PlaceholderAdNetwork();
+    await pumpBeam(tester, network: net);
+    expect(net.initCount, 1);
+  });
+
+  testWidgets('banner and offer never on the Torch tab; shown on Signal and Screen', (tester) async {
+    await pumpBeam(tester, network: PlaceholderAdNetwork());
+    expect(find.byKey(const Key('ad-banner-home_banner')), findsNothing);
+    expect(find.byKey(const Key('ad-free-offer')), findsNothing);
+    for (final tab in ['nav-signal', 'nav-screen']) {
+      await tester.tap(find.byKey(Key(tab)));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('ad-banner-home_banner')), findsOneWidget, reason: tab);
+      expect(find.byKey(const Key('ad-free-offer')), findsOneWidget, reason: tab);
+    }
+    await tester.tap(find.byKey(const Key('nav-torch')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('ad-banner-home_banner')), findsNothing);
+  });
+
+  testWidgets('banner is removed while the glow covers the screen', (tester) async {
+    await pumpBeam(tester, network: PlaceholderAdNetwork(), cap: noGrace());
+    await tester.tap(find.byKey(const Key('nav-screen')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('glow-start')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('ad-banner-home_banner')), findsNothing);
+  });
+
+  testWidgets('no offer while no rewarded ad is loaded', (tester) async {
+    await pumpBeam(tester, network: PlaceholderAdNetwork(rewardedLoaded: false));
+    await tester.tap(find.byKey(const Key('nav-signal')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('ad-free-offer')), findsNothing);
     expect(find.byKey(const Key('ad-banner-home_banner')), findsOneWidget);
+  });
+
+  testWidgets('interstitial after the glow, then capped', (tester) async {
+    final (_, s) = await pumpBeam(tester, network: PlaceholderAdNetwork(), cap: noGrace());
     await tester.tap(find.byKey(const Key('nav-screen')));
     await tester.pumpAndSettle();
     for (var i = 0; i < 2; i++) {
@@ -196,8 +243,62 @@ void main() {
         await tester.pumpAndSettle();
       }
     }
-    expect(ads.log, ['screen_light_exit:shown', 'screen_light_exit:capped']);
+    expect(s.ads.log, ['screen_light_exit:shown', 'screen_light_exit:capped']);
     expect(find.byKey(const Key('ad-interstitial')), findsNothing);
+  });
+
+  testWidgets('watching the rewarded ad to the end removes ads for 24 hours', (tester) async {
+    final now = DateTime(2026, 10, 18, 9, 30);
+    final (_, s) = await pumpBeam(tester, network: PlaceholderAdNetwork(), cap: noGrace(), clock: () => now);
+    await tester.tap(find.byKey(const Key('nav-signal')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('ad-free-offer')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('ad-rewarded-finish')));
+    await tester.pumpAndSettle();
+    expect(s.settings.adFreeUntil, now.add(const Duration(hours: 24)));
+    expect(find.textContaining('No ads until'), findsOneWidget);
+    expect(find.byKey(const Key('ad-banner-home_banner')), findsNothing);
+    expect(find.byKey(const Key('ad-free-offer')), findsNothing);
+    // Interstitials are off too (wait for the snackbar to clear the button).
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('signal-start')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('flash-warning-ok')));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.byKey(const Key('signal-start')));
+    await tester.pumpAndSettle();
+    expect(s.ads.log.last, 'signal_stopped:ad-free');
+    expect(find.byKey(const Key('ad-interstitial')), findsNothing);
+  });
+
+  testWidgets('closing the rewarded ad early grants nothing', (tester) async {
+    final (_, s) = await pumpBeam(tester, network: PlaceholderAdNetwork());
+    await tester.tap(find.byKey(const Key('nav-screen')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('ad-free-offer')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('ad-rewarded-close')));
+    await tester.pumpAndSettle();
+    expect(s.settings.adFreeUntil, isNull);
+    expect(find.textContaining('closed early'), findsOneWidget);
+    expect(find.byKey(const Key('ad-banner-home_banner')), findsOneWidget);
+  });
+
+  testWidgets('about sheet: ads wording and ad-free status', (tester) async {
+    final now = DateTime(2026, 10, 18, 9, 30);
+    await pumpBeam(
+      tester,
+      network: PlaceholderAdNetwork(),
+      clock: () => now,
+      prefs: {'adFreeUntil': now.add(const Duration(hours: 5)).millisecondsSinceEpoch},
+    );
+    await tester.tap(find.byKey(const Key('about')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Google AdMob'), findsOneWidget);
+    expect(find.byKey(const Key('about-ad-free')), findsOneWidget);
+    expect(find.text('Until 14:30'), findsOneWidget);
   });
 
   testWidgets('about sheet shows version and privacy/terms links', (tester) async {

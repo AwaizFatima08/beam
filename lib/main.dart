@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'ads/admob_network.dart';
 import 'ads/ads.dart';
 import 'app.dart';
 import 'services/screen.dart';
@@ -13,14 +14,18 @@ Future<void> main() async {
   final settings = await Settings.load();
   final torch = TorchController(MethodChannelTorch());
   await torch.init(savedStrength: settings.torchStrength);
+  final ads = Ads(network: _adNetwork(), settings: settings, isLightOn: () => torch.isOn || torch.patternRunning);
   runApp(
     BeamApp(
-      services: AppServices(
-        torch: torch,
-        settings: settings,
-        ads: AdService.fromEnvironment(),
-        screen: const ScreenControl(),
-      ),
+      services: AppServices(torch: torch, settings: settings, ads: ads, screen: const ScreenControl()),
     ),
   );
 }
+
+/// `--dart-define=BEAM_ADS=admob|placeholder|off` (default: admob). Debug and
+/// profile builds use Google's sample units; see lib/ads/ad_ids.dart.
+AdNetwork _adNetwork() => switch (const String.fromEnvironment('BEAM_ADS')) {
+  'off' => NoAdNetwork(),
+  'placeholder' => PlaceholderAdNetwork(),
+  _ => AdMobNetwork(),
+};

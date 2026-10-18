@@ -12,7 +12,7 @@ class AppServices {
 
   final TorchController torch;
   final Settings settings;
-  final AdService ads;
+  final Ads ads;
   final ScreenControl screen;
 }
 

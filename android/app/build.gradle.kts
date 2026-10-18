@@ -35,6 +35,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Google's sample AdMob app id for debug/profile builds.
+        manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
     }
 
     signingConfigs {
@@ -50,6 +52,9 @@ android {
 
     buildTypes {
         release {
+            // Beam's AdMob app id (HomiLabs account). Replace before releasing;
+            // scripts/check-release-ad-ids.sh refuses the sample id.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
             signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true

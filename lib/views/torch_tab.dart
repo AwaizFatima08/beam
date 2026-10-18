@@ -39,7 +39,7 @@ class TorchTab extends StatelessWidget {
                     key: const Key('about'),
                     tooltip: 'About Beam',
                     icon: const Icon(Icons.info_outline, color: Colors.white60),
-                    onPressed: () => showAboutSheet(context),
+                    onPressed: () => showAboutSheet(context, services.ads),
                   ),
                 ],
               ),

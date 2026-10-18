@@ -34,6 +34,17 @@ class Settings extends ChangeNotifier {
   String get morseText => _prefs.getString('morseText') ?? 'HELLO';
   set morseText(String v) => _prefs.setString('morseText', v);
 
+  /// End of the 24-hour ad-free pass earned with a rewarded ad (null = none).
+  DateTime? get adFreeUntil {
+    final ms = _prefs.getInt('adFreeUntil');
+    return ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms);
+  }
+
+  set adFreeUntil(DateTime? v) {
+    v == null ? _prefs.remove('adFreeUntil') : _prefs.setInt('adFreeUntil', v.millisecondsSinceEpoch);
+    notifyListeners();
+  }
+
   /// Set once the user has acknowledged the flashing-light warning.
   bool get flashWarningAccepted => _prefs.getBool('flashWarningAccepted') ?? false;
   set flashWarningAccepted(bool v) => _prefs.setBool('flashWarningAccepted', v);

@@ -24,6 +24,9 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _torch.addListener(_onTorch);
+    // Consent and ad loading start after the first frame, so the torch is
+    // usable immediately and the consent form (EEA/UK) has an activity.
+    WidgetsBinding.instance.addPostFrameCallback((_) => widget.services.ads.init());
   }
 
   @override
@@ -65,7 +68,13 @@ class _HomeViewState extends State<HomeView> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AdBannerSlot(ads: s.ads, placement: AdPlacement.homeBanner),
+          // No ads on the Torch tab, and none while a glow, signal or dialog
+          // covers this screen (the banner is disposed, so it never refreshes
+          // unseen).
+          if (_tab != 0 && (ModalRoute.of(context)?.isCurrent ?? true)) ...[
+            AdFreeOffer(ads: s.ads),
+            AdBannerSlot(ads: s.ads, placement: AdPlacement.homeBanner),
+          ],
           NavigationBar(
             selectedIndex: _tab,
             onDestinationSelected: _goTo,
@@ -154,4 +163,66 @@ class StatusPill extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "No ads for 24 hours" — shown only while a rewarded ad is actually loaded
+/// and the user isn't already ad-free, so it can never dead-end.
+class AdFreeOffer extends StatelessWidget {
+  const AdFreeOffer({super.key, required this.ads});
+  final Ads ads;
+
+  Future<void> _watch(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final outcome = await ads.watchForAdFree(context);
+    final msg = switch (outcome) {
+      Rewarded() => 'Thanks! No ads until ${formatAdFreeUntil(ads.adFreeUntil)}.',
+      Dismissed() => 'The ad was closed early, so no reward this time.',
+      NoFill() => 'No ad is available right now. Please try again later.',
+    };
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: ads,
+      builder: (context, _) {
+        if (!ads.canOfferAdFree) return const SizedBox.shrink();
+        return Material(
+          color: const Color(0xFF15181D),
+          child: InkWell(
+            key: const Key('ad-free-offer'),
+            onTap: () => _watch(context),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.block, size: 18, color: beamAmber),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text('No ads for 24 hours', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                  Text(
+                    'Watch a short ad',
+                    style: TextStyle(color: beamAmber, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// "14:05" today, "tomorrow 14:05" otherwise.
+String formatAdFreeUntil(DateTime? until, {DateTime? now}) {
+  if (until == null) return '';
+  final n = now ?? DateTime.now();
+  final hm = '${until.hour.toString().padLeft(2, '0')}:${until.minute.toString().padLeft(2, '0')}';
+  final sameDay = until.year == n.year && until.month == n.month && until.day == n.day;
+  return sameDay ? hm : 'tomorrow $hm';
 }

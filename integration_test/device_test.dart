@@ -18,10 +18,12 @@ Future<AppServices> launch(WidgetTester tester) async {
   SharedPreferences.setMockInitialValues({'flashWarningAccepted': true});
   torch = TorchController(MethodChannelTorch());
   await torch.init();
+  final settings = await Settings.load();
   final services = AppServices(
     torch: torch,
-    settings: await Settings.load(),
-    ads: PlaceholderAdService(cap: FrequencyCap(launchGrace: const Duration(hours: 1))),
+    settings: settings,
+    // No ads in the flash tests: they must not wait on network fills.
+    ads: Ads(network: NoAdNetwork(), settings: settings, isLightOn: () => torch.isOn),
     screen: const ScreenControl(),
   );
   await tester.pumpWidget(BeamApp(services: services));
