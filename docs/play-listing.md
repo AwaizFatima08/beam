@@ -101,8 +101,8 @@ Hosted on the HomiLabs tools site (source: `/mnt/storage/projects/homilabs_tools
       marketing, Analytics, Fraud prevention/security. Data is encrypted in transit. Users can't request deletion
       from Beam itself (no account) — point to Google's controls.
 - [x] Store listing → full description updated (above); AI asset declaration: don't label (graphics are code-drawn)
-- [ ] Upload `releases/v1.1.0-3/beam-1.1.0-3.aab` to Production, then send all changes for review together (managed publishing is off)
-- [ ] Release notes:
+- [x] Upload `releases/v1.1.0-3/beam-1.1.0-3.aab` to Production, then send all changes for review together (managed publishing is off) — submitted 2026-10-19, 100 % roll-out
+- [x] Release notes:
 ```
 <en-US>
 Beam is now free with a few ads.
