@@ -15,7 +15,7 @@ Play app created in the Homilabs org account (app id 4975968279685186807); listi
 Privacy policy and terms live on the shared tools site: https://tools.homilabs.org/privacy#beam and /terms#beam (source `/mnt/storage/projects/homilabs_tools/site/`, manual upload to Hostinger).
 **Live on Google Play** since 2026-10-02: 1.0.1 (versionCode 2) in production — https://play.google.com/store/apps/details?id=com.homilabs.beam
 Homi will review user feedback around **2026-11-02** and then decide on a revision/upgrade (likely candidates: AdMob per `docs/ads.md`, anything raised in reviews). Next versionCode must be ≥ 3.
-**1.1.0 (versionCode 3) — AdMob, in progress:** code done and tested with sample ids (40 host tests). Not released. To do: register Beam in the HomiLabs AdMob account (homilabs.smc@gmail.com), put the real app id + 3 unit ids in `lib/ads/ad_ids.dart` and `android/app/build.gradle.kts`, app-ads.txt, upload the updated privacy policy, Play Console changes — checklist in `docs/play-listing.md`.
+**1.1.0 (versionCode 3) — AdMob:** Beam registered in the HomiLabs AdMob account (AdMob app 4314351695, app id `ca-app-pub-2087846699268567~4314351695`, under Google review from 2026-10-18), units: banner `…/1688188358`, interstitial `…/5807221758`, rewarded `…/9670620150`. Release check PASS; signed AAB/APK in `releases/v1.1.0-3/`. Verified on the `beam_api35` emulator with sample ids (2026-10-18): no banner on Torch tab, banner + offer on Signal/Screen, rewarded → 24 h ad-free, interstitial after glow exit. Still to do: upload the updated privacy policy + site card, Play Console changes and upload (checklist in `docs/play-listing.md`).
 Open item: the About sheet has not been checked on a real phone yet.
 
 ## Commands
@@ -32,4 +32,5 @@ Open item: the About sheet has not been checked on a real phone yet.
 ## Machine notes
 - Test phone: Samsung Galaxy A12 SM-A125F, Android 12, id `R58R61F3FDK`. No flash strength API (maxStrength 1).
 - Debug builds start slowly on this phone (~6 s); wait before sending taps. Release cold start ~0.75 s.
+- Emulator: dedicated AVD `beam_api35` (`ANDROID_AVD_HOME=/mnt/storage/projects/android-avd`), port 5590. Follow `~/.claude/heavy-jobs.md` (one heavy job at a time, RAM check, GPU not usable for emulator GLES yet).
 - Flash state for checks: `adb shell dumpsys media.camera | grep -A3 "torch events log"`; window brightness: `adb shell dumpsys power | grep BrightnessOverrideFromWindow`.

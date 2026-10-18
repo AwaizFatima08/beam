@@ -52,9 +52,9 @@ android {
 
     buildTypes {
         release {
-            // Beam's AdMob app id (HomiLabs account). Replace before releasing;
+            // Beam's AdMob app id (HomiLabs account, AdMob app 4314351695).
             // scripts/check-release-ad-ids.sh refuses the sample id.
-            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-2087846699268567~4314351695"
             signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true

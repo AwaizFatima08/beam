@@ -21,11 +21,12 @@ class AdUnitIds {
     rewarded: 'ca-app-pub-3940256099942544/5224354917',
   );
 
-  /// Beam's real units. Replace with the ids from AdMob before releasing.
+  /// Beam's own units in the HomiLabs AdMob account (app 4314351695),
+  /// created 2026-10-18. Names in AdMob match the placement ids.
   static const release = AdUnitIds(
-    banner: 'ca-app-pub-3940256099942544/6300978111',
-    interstitial: 'ca-app-pub-3940256099942544/1033173712',
-    rewarded: 'ca-app-pub-3940256099942544/5224354917',
+    banner: 'ca-app-pub-2087846699268567/1688188358', // Beam home_banner
+    interstitial: 'ca-app-pub-2087846699268567/5807221758', // Beam interstitial (glow exit, signal stop)
+    rewarded: 'ca-app-pub-2087846699268567/9670620150', // Beam ad_free_reward (24 h ad-free)
   );
 
   /// Debug and profile builds always use the sample units, so testing on a
